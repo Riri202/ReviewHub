@@ -11,10 +11,10 @@ const createReview = async (req, res) => {
     });
 
     if (alreadyReviewed) {
-      res.status(400).send('Book already reviewed');
+      return res.status(400).send('Book already reviewed');
     }
 
-    const review = await Review.create({
+    await Review.create({
       rating,
       comment,
       user: req.user._id,
@@ -32,7 +32,7 @@ const createReview = async (req, res) => {
       await book.save();
     }
 
-    res.status(201).json(review);
+    res.redirect(`/api/books/${bookId}`);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -125,7 +125,7 @@ const deleteReview = async (req, res) => {
     }
 
     await review.remove();
-    res.json({ message: 'Review removed' });
+    res.redirect(`/api/books/${book._id}`)
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

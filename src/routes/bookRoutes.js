@@ -14,7 +14,7 @@ router.route('/')
   .post(protect, admin, createBook);
 
 router.route('/:id')
-  .get(getBookById)
+  .get(protect, getBookById)
   .put(protect, admin, updateBook)
   .delete(protect, admin, deleteBook);
 

@@ -1,0 +1,44 @@
+<h1>Book Catalog</h1>
+
+<!-- Search Form -->
+<form action="/catalog" method="GET">
+  <div class="form-group">
+    <label for="search">Search Books</label>
+    <input type="text" name="search" placeholder="Search by title or author" />
+  </div>
+  <button class="btn" type="submit">Search</button>
+</form>
+
+{{#if isAdmin}}
+<form style="margin-top: 15px;" action="/create-book" method="GET">
+  <button class="btn" type="submit">Add to Catalog</button>
+</form>
+{{/if}}
+
+<!-- Book List -->
+<div class="book-list">
+  {{#each books}}
+    <div class="book-item">
+      <h3><a href="/api/books/{{this._id}}">{{this.title}}</a></h3>
+      <p>Author: {{this.author}}</p>
+      <p>Genre: {{this.genre}}</p>
+      <p>Rating: {{this.rating}} / 5</p>
+      <p>Rating Count: {{this.ratingCount}}</p>
+    </div>
+  {{else}}
+    <p>No books found.</p>
+  {{/each}}
+</div>
+
+<!-- Pagination Controls -->
+{{#if books.length}}
+  <div class="pagination">
+    {{#if prevPage}}
+      <a href="/catalog?page={{ math currentPage 1 'subtract'}}">Previous</a>
+    {{/if}}
+    <span>Page {{currentPage}} of {{totalPages}}</span>
+    {{#if nextPage}}
+      <a href="/catalog?page={{math currentPage 1 'add'}}">Next</a>
+    {{/if}}
+  </div>
+{{/if}}

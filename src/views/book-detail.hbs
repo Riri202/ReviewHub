@@ -1,0 +1,105 @@
+<div class="dashboard">
+  {{! <a href="/catalog" class="btn-secondary">Back to Catalog</a> }}
+
+  <div class="book-details-header">
+    <h1>{{book.title}}</h1>
+
+    <div>
+      {{#if hasBeenAddedToReadingList}}
+
+        <form action="/api/users/reading-list" method="POST">
+          <input type="text" hidden name="bookId" value="{{book._id}}" />
+          <button type="submit" class="btn">Remove from Reading List</button>
+        </form>
+      {{else}}
+        <form action="/api/users/reading-list?_method=PUT" method="POST">
+          <input type="text" hidden name="bookId" value="{{book._id}}" />
+          <button type="submit" value="{{book._id}}" class="btn">Add to Reading
+            List</button>
+        </form>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="book-details">
+    <p><strong>Author:</strong> {{book.author}}</p>
+    <p><strong>Genre:</strong> {{book.genre}}</p>
+    <p><strong>Rating:</strong>
+      {{book.rating}}
+      / 5 ({{book.ratingCount}}
+      ratings)</p>
+    <p><strong>Added By:</strong> {{book.user.name}}</p>
+    <p><strong>Added On:</strong> {{formatDate book.createdAt}}</p>
+
+    {{#if isAdmin}}
+      <div class="admin-controls">
+        <form action="/edit-book/{{book._id}}" method="GET">
+          <button type="submit" class="btn">Edit</button>
+        </form>
+        <form action="/api/books/{{book._id}}?_method=DELETE" method="POST">
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+      </div>
+    {{/if}}
+  </div>
+
+  <h2>Reviews</h2>
+  {{#if hasBeenReviewed}}
+    <p style="text-align: center; font-style:italic; margin-top: 10px">You have
+      already reviewed this book.</p>
+  {{else}}
+    <form style="" action="/api/reviews" method="POST">
+      <div class="form-group">
+        <label for="comment">Comment</label>
+        <input type="text" id="comment" name="comment" />
+      </div>
+      <div class="form-group">
+        <label for="rating">Your Rating (0 to 5)</label>
+        <input
+          type="number"
+          id="rating"
+          name="rating"
+          min="0"
+          max="5"
+          step="1"
+          required
+        />
+      </div>
+      <input type="text" hidden name="bookId" value="{{book._id}}" />
+      <button type="submit" class="btn">Add Review</button>
+    </form>
+  {{/if}}
+
+  {{#if reviews.length}}
+    <ul class="review-list">
+      {{#each reviews}}
+        <li class="review-item">
+          <div class="review-header">
+            <strong class="review-comment">{{this.comment}}</strong>
+            <span class="review-rating">Rating: {{this.rating}} / 5</span>
+          </div>
+          <div class="review-footer">
+            <span class="review-createdBy">By: {{this.user.name}}</span>
+            <span class="review-createdDate">On:
+              {{formatDate this.createdAt}}</span>
+          </div>
+            {{#if this.isOwnReview}}
+          <div class="admin-controls">
+            <form action="/edit-book/{{book._id}}" method="GET">
+              <button type="submit" class="btn">Edit</button>
+            </form>
+            <form action="/api/reviews/{{this._id}}?_method=DELETE" method="POST">
+              <button type="submit" class="btn-danger">Delete</button>
+            </form>
+          </div>
+        {{/if}}
+        </li>
+      
+      {{/each}}
+    </ul>
+  {{else}}
+    <p style="text-align: center; font-style:italic; margin-top: 10px">No
+      reviews yet.</p>
+  {{/if}}
+
+</div>

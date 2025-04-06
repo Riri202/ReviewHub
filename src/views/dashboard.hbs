@@ -1,0 +1,30 @@
+<div class="dashboard">
+  <h2>Dashboard</h2>
+
+  <div class="welcome-message">
+    <h3>Welcome, {{user.name}}!</h3>
+    <p>Email: {{user.email}}</p>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="reading-list">
+      <h3>Your Reading List</h3>
+
+      {{#if user.readingList.length}}
+        <ul>
+          {{#each user.readingList}}
+            <li class="book-item">
+              <strong>{{this.title}}</strong>
+              by
+              {{this.author}}
+              <br />
+              <span>Rating: {{this.rating}} / 5</span>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <p>Your reading list is empty. Start adding books to it!</p>
+      {{/if}}
+    </div>
+  </div>
+</div>
