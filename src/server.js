@@ -12,6 +12,7 @@ const { isAdmin } = require("./utils");
 const methodOverride = require('method-override');
 
 const Book = require("./models/bookModel");
+const Review = require("./models/reviewModel");
 
 dotenv.config();
 
@@ -119,6 +120,12 @@ app.get("/edit-book/:id", protect, admin, async (req, res) => {
   const book = await Book.findById(req.params.id);
   if (!book) return res.status(404).send("Book not found");
   res.render("edit-book", { book: book.toObject() });
+});
+
+app.get("/edit-review/:id", protect, async (req, res) => {
+  const review = await Review.findById(req.params.id);
+  if (!review) return res.status(404).send("Review not found");
+  res.render("edit-review", { review: review.toObject() });
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,5 +1,5 @@
-const Review = require('../models/reviewModel');
-const Book = require('../models/bookModel');
+const Review = require("../models/reviewModel");
+const Book = require("../models/bookModel");
 
 const createReview = async (req, res) => {
   const { bookId, rating, comment } = req.body;
@@ -11,7 +11,7 @@ const createReview = async (req, res) => {
     });
 
     if (alreadyReviewed) {
-      return res.status(400).send('Book already reviewed');
+      return res.status(400).send("Book already reviewed");
     }
 
     await Review.create({
@@ -24,12 +24,13 @@ const createReview = async (req, res) => {
     const book = await Book.findById(bookId);
     
     if (book) {
-      const newRating = (book.rating * book.ratingCount + rating) / (book.ratingCount + 1);
-      
-      book.rating = newRating;
-      book.ratingCount += 1;
-      
-      await book.save();
+      const newRating =
+        (book.rating * book.ratingCount + Number(rating)) / (book.ratingCount + 1);
+      const newRatingCount = (book.ratingCount += 1);
+      await Book.findByIdAndUpdate(book._id, {
+        rating: newRating,
+        ratingCount: newRatingCount,
+      });
     }
 
     res.redirect(`/api/books/${bookId}`);
@@ -41,7 +42,7 @@ const createReview = async (req, res) => {
 const getBookReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ book: req.params.id })
-      .populate('user', 'name')
+      .populate("user", "name")
       .sort({ createdAt: -1 });
 
     res.json(reviews);
@@ -53,7 +54,7 @@ const getBookReviews = async (req, res) => {
 const getUserReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.user._id })
-      .populate('book', 'title author')
+      .populate("book", "title author")
       .sort({ createdAt: -1 });
 
     res.json(reviews);
@@ -69,29 +70,31 @@ const updateReview = async (req, res) => {
     const review = await Review.findById(req.params.id);
 
     if (!review) {
-      res.status(404).send('Review not found');
+      res.status(404).send("Review not found");
     }
 
     if (review.user.toString() !== req.user._id.toString()) {
-      res.status(403).send('User not authorized');
+      res.status(403).send("You are not authorized to edit this review");
     }
 
     const oldRating = review.rating;
-    
-    review.rating = rating || review.rating;
+
+    review.rating = Number(rating) || review.rating;
     review.comment = comment || review.comment;
-    
-    const updatedReview = await review.save();
+
+    await review.save({ validateModifiedOnly: true });
 
     const book = await Book.findById(review.book);
-    
+
     if (book && rating) {
-      const adjustedRating = (book.rating * book.ratingCount - oldRating + rating) / book.ratingCount;
+      const adjustedRating =
+        (book.rating * book.ratingCount - oldRating + Number(rating)) /
+        book.ratingCount;
       book.rating = adjustedRating;
-      await book.save();
+      await book.save({ validateModifiedOnly: true });
     }
 
-    res.json(updatedReview);
+    res.redirect(`/api/books/${book._id}`);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -102,30 +105,38 @@ const deleteReview = async (req, res) => {
     const review = await Review.findById(req.params.id);
 
     if (!review) {
-      res.status(404).send('Review not found');
+      res.status(404).send("Review not found");
     }
 
     if (review.user.toString() !== req.user._id.toString()) {
-      res.status(403).send('User not authorized');
+      res.status(403).send("You are not authorized to delete this review");
     }
 
     const book = await Book.findById(review.book);
-    
-    if (book && book.ratingCount > 1) {
-      const adjustedRating = (book.rating * book.ratingCount - review.rating) / (book.ratingCount - 1);
-      book.rating = adjustedRating;
-      book.ratingCount -= 1;
-    } else if (book) {
-      book.rating = 0;
-      book.ratingCount = 0;
-    }
-    
+
     if (book) {
-      await book.save();
+      let updatedFields = {};
+
+      if (book.ratingCount > 1) {
+        const adjustedRating =
+          (book.rating * book.ratingCount - review.rating) /
+          (book.ratingCount - 1);
+        updatedFields = {
+          rating: adjustedRating,
+          ratingCount: book.ratingCount - 1,
+        };
+      } else {
+        updatedFields = {
+          rating: 0,
+          ratingCount: 0,
+        };
+      }
+
+      await Book.findByIdAndUpdate(book._id, updatedFields, { new: true });
     }
 
-    await review.remove();
-    res.redirect(`/api/books/${book._id}`)
+    await review.deleteOne({ _id: req.params.id });
+    res.redirect(`/api/books/${book._id}`);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

@@ -24,7 +24,7 @@
   <div class="book-details">
     <p><strong>Author:</strong> {{book.author}}</p>
     <p><strong>Genre:</strong> {{book.genre}}</p>
-    <p><strong>Rating:</strong>
+    <p><strong>Average Rating:</strong>
       {{book.rating}}
       / 5 ({{book.ratingCount}}
       ratings)</p>
@@ -85,7 +85,7 @@
           </div>
             {{#if this.isOwnReview}}
           <div class="admin-controls">
-            <form action="/edit-book/{{book._id}}" method="GET">
+            <form action="/edit-review/{{this._id}}" method="GET">
               <button type="submit" class="btn">Edit</button>
             </form>
             <form action="/api/reviews/{{this._id}}?_method=DELETE" method="POST">

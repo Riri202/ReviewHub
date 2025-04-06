@@ -104,6 +104,22 @@ footer {
   text-decoration: none;
 }
 
+.search-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+}
+
+.search-form div {
+  flex-grow: 1;
+}
+
+.search-form .btn {
+margin-top: 7px;
+}
+
 .btn-danger {
   display: inline-block;
   background-color: red;
@@ -242,6 +258,13 @@ footer {
   justify-content: start;
   align-items: center;
   gap: 10px;
+}
+.catalog-admin-header {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .review-list {

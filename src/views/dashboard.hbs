@@ -6,25 +6,23 @@
     <p>Email: {{user.email}}</p>
   </div>
 
-  <div class="dashboard-content">
-    <div class="reading-list">
-      <h3>Your Reading List</h3>
+  <h3>Your Reading List</h3>
+  <h5>Add more books to your list by browsing the catalog</h5>
+  {{#if user.readingList.length}}
+    <div class="book-list">
 
-      {{#if user.readingList.length}}
-        <ul>
-          {{#each user.readingList}}
-            <li class="book-item">
-              <strong>{{this.title}}</strong>
-              by
-              {{this.author}}
-              <br />
-              <span>Rating: {{this.rating}} / 5</span>
-            </li>
-          {{/each}}
-        </ul>
-      {{else}}
-        <p>Your reading list is empty. Start adding books to it!</p>
-      {{/if}}
+      {{#each user.readingList}}
+        <div class="book-item">
+          <h3><a href="/api/books/{{this._id}}">{{this.title}}</a></h3>
+          <p>Author: {{this.author}}</p>
+          <p>Genre: {{this.genre}}</p>
+          <p>Rating: {{this.rating}} / 5</p>
+          <p>Rating Count: {{this.ratingCount}}</p>
+        </div>
+      {{/each}}
     </div>
-  </div>
+
+  {{else}}
+    <p>Your reading list is empty. Start adding books to it from the catalog!</p>
+  {{/if}}
 </div>

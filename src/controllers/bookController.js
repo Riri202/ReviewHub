@@ -51,7 +51,7 @@ const getBooks = async (req, res) => {
       isAdmin: isAdmin(user),
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -62,7 +62,7 @@ const getBookById = async (req, res) => {
       return res.status(400).send("Book ID not provided");
     }
 
-    const book = await Book.findById(req.params.id).populate('user');
+    const book = await Book.findById(req.params.id).populate("user");
 
     if (!book) {
       return res.status(404).send("Book not found");
@@ -70,39 +70,44 @@ const getBookById = async (req, res) => {
 
     const user = req.user.toObject();
     const isAdminUser = isAdmin(user);
+    let fixedReviews = [];
 
-    const reviews = await Review.find({ book: req.params.id }).populate('user');
+    const reviews = await Review.find({ book: req.params.id }).populate("user");
 
-    const fixedReviews = mongooseDocsToObjects(reviews)
+    if (reviews.length) {
 
-    fixedReviews.forEach(review => {
-      review.isOwnReview = review.user._id.toString() === user._id.toString();    });
+      fixedReviews = mongooseDocsToObjects(reviews);
+  
+      fixedReviews.forEach((review) => {
+        review.isOwnReview = review.user._id.toString() === user._id.toString();
+      });
+    }
 
-    const hasBeenAddedToReadingList = 
-      user.readingList?.some(item => item._id.equals(book._id));
 
-    const hasBeenReviewed = (await Review.find({
-      user: req.user._id,
-      book: req.params.id
-    })).length > 0;
+    const hasBeenAddedToReadingList = user.readingList?.some((item) =>
+      item._id.equals(book._id)
+    );
 
-    console.log({fixedReviews})
-    res.render('book-detail', {
+    const hasBeenReviewed =
+      (
+        await Review.find({
+          user: req.user._id,
+          book: req.params.id,
+        })
+      ).length > 0;
+    res.render("book-detail", {
       book: book.toObject(),
       user,
       isAdmin: isAdminUser,
       hasBeenAddedToReadingList,
       hasBeenReviewed,
-      reviews: fixedReviews
+      reviews: fixedReviews,
     });
-
   } catch (error) {
     console.error("Error fetching book:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 
 const updateBook = async (req, res) => {
   try {
@@ -110,7 +115,7 @@ const updateBook = async (req, res) => {
     await Book.findByIdAndUpdate(req.params.id, { title, author, genre });
     res.redirect(`/api/books/${req.params.id}`);
   } catch (err) {
-    res.status(500).send('Something went wrong');
+    res.status(500).send("Something went wrong");
   }
 };
 

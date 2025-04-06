@@ -1,19 +1,20 @@
-<h1>Book Catalog</h1>
+<div class="catalog-admin-header">
+  <h1>Book Catalog</h1>
+  {{#if isAdmin}}
+    <form style="margin-top: 15px;" action="/create-book" method="GET">
+      <button class="btn" type="submit">Add to Catalog</button>
+    </form>
+  {{/if}}
+</div>
 
 <!-- Search Form -->
-<form action="/catalog" method="GET">
+<form class="search-form" action="/catalog" method="GET">
   <div class="form-group">
     <label for="search">Search Books</label>
     <input type="text" name="search" placeholder="Search by title or author" />
   </div>
   <button class="btn" type="submit">Search</button>
 </form>
-
-{{#if isAdmin}}
-<form style="margin-top: 15px;" action="/create-book" method="GET">
-  <button class="btn" type="submit">Add to Catalog</button>
-</form>
-{{/if}}
 
 <!-- Book List -->
 <div class="book-list">
@@ -34,7 +35,7 @@
 {{#if books.length}}
   <div class="pagination">
     {{#if prevPage}}
-      <a href="/catalog?page={{ math currentPage 1 'subtract'}}">Previous</a>
+      <a href="/catalog?page={{math currentPage 1 'subtract'}}">Previous</a>
     {{/if}}
     <span>Page {{currentPage}} of {{totalPages}}</span>
     {{#if nextPage}}
